@@ -1,0 +1,276 @@
+{
+  "generatedAt": null,
+  "source": "seed",
+  "note": "Provisional, engine-vetted seed. Replace via scripts/build-traps.mjs with real Lichess data.",
+  "traps": [
+    {
+      "id": "scotch-qh4-a6-nc7",
+      "opening": "scotch",
+      "name": "Scotch: ...Qh4 & ...a6 walk into Nxc7+",
+      "line": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "exd4",
+        "Nxd4",
+        "Qh4",
+        "Nb5"
+      ],
+      "fen": "r1b1kbnr/pppp1ppp/2n5/1N6/4P2q/8/PPP2PPP/RNBQKB1R b KQkq - 2 5",
+      "mistake": {
+        "san": "a6",
+        "freqPct": 6,
+        "winRate": 74
+      },
+      "punish": [
+        {
+          "san": "Nxc7+",
+          "why": "Nb5 already eyed this fork. Kicking with ...a6 ignores it: Nxc7+ forks the king and the a8-rook."
+        },
+        {
+          "san": "Kd8",
+          "why": "Forced off the check — nothing can capture the c7-knight."
+        },
+        {
+          "san": "Nxa8",
+          "why": "Collects the rook. White is up the exchange and a pawn; the knight trades itself off or escapes via b6/c7."
+        }
+      ],
+      "payoff": "wins the exchange and a pawn — the c7-fork nets the rook",
+      "popularity_rank": 144,
+      "evalCp": 440,
+      "provisional": true
+    },
+    {
+      "id": "caro-fantasy-dxe5",
+      "opening": "caro-kann",
+      "name": "Caro-Kann Fantasy: 5.dxe5?? and the king hunt",
+      "line": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "f3",
+        "dxe4",
+        "fxe4",
+        "e5"
+      ],
+      "fen": "rnbqkbnr/pp3ppp/2p5/4p3/3PP3/8/PPP3PP/RNBQKBNR w KQkq - 0 5",
+      "mistake": {
+        "san": "dxe5",
+        "freqPct": 9,
+        "winRate": 63
+      },
+      "punish": [
+        {
+          "san": "Qh4+",
+          "why": "With f2 and f3 vacated, the queen check rakes the king. On g3, ...Qxe4+ even wins the rook, so White must run."
+        },
+        {
+          "san": "Kd2",
+          "why": "The only way to keep material — but now the king is walking."
+        },
+        {
+          "san": "Qf4+",
+          "why": "Chasing the king further and clearing the way to e4."
+        },
+        {
+          "san": "Ke1",
+          "why": "Back it goes, having lost the right to castle for good."
+        },
+        {
+          "san": "Qxe4+",
+          "why": "Regains the pawn with check; Black is fully developed while White’s king is stuck on e1."
+        }
+      ],
+      "payoff": "regains the pawn and White’s king is stranded in the centre, castling gone",
+      "popularity_rank": 117,
+      "evalCp": 90,
+      "provisional": true
+    },
+    {
+      "id": "scotch-e5-ng4",
+      "opening": "scotch",
+      "name": "Scotch: ...Ng4 knight lunge",
+      "line": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "exd4",
+        "Nxd4",
+        "Nf6",
+        "Nxc6",
+        "bxc6",
+        "e5"
+      ],
+      "fen": "r1bqkb1r/p1pp1ppp/2p2n2/4P3/8/8/PPP2PPP/RNBQKB1R b KQkq - 0 6",
+      "mistake": {
+        "san": "Ng4",
+        "freqPct": 4,
+        "winRate": 78
+      },
+      "punish": [
+        {
+          "san": "Qxg4",
+          "why": "The knight jumps to g4 eyeing e5 and f2, but nothing defends g4 — the queen just takes it."
+        }
+      ],
+      "payoff": "wins a piece",
+      "popularity_rank": 112,
+      "evalCp": 400,
+      "provisional": true
+    },
+    {
+      "id": "caro-advance-nh4",
+      "opening": "caro-kann",
+      "name": "Caro-Kann Advance: 5.Nh4?? grabs at the bishop",
+      "line": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "e5",
+        "Bf5",
+        "Nf3",
+        "e6"
+      ],
+      "fen": "rn1qkbnr/pp3ppp/2p1p3/3pPb2/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 5",
+      "mistake": {
+        "san": "Nh4",
+        "freqPct": 3.5,
+        "winRate": 82
+      },
+      "punish": [
+        {
+          "san": "Qxh4",
+          "why": "White reaches for the f5-bishop, but h4 is undefended — the queen swings out and wins the knight outright."
+        }
+      ],
+      "payoff": "wins a piece",
+      "popularity_rank": 112,
+      "evalCp": 390,
+      "provisional": true
+    },
+    {
+      "id": "scotch-c4-nf4",
+      "opening": "scotch",
+      "name": "Scotch: ...Nf4 over-eager jump",
+      "line": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "exd4",
+        "Nxd4",
+        "Nf6",
+        "Nxc6",
+        "bxc6",
+        "e5",
+        "Qe7",
+        "Qe2",
+        "Nd5",
+        "c4"
+      ],
+      "fen": "r1b1kb1r/p1ppqppp/2p5/3nP3/2P5/8/PP2QPPP/RNB1KB1R b KQkq - 0 8",
+      "mistake": {
+        "san": "Nf4",
+        "freqPct": 3,
+        "winRate": 80
+      },
+      "punish": [
+        {
+          "san": "Bxf4",
+          "why": "Kicked by c4, the knight lands on f4 hitting the queen — but the c1-bishop covers f4 and pockets it."
+        }
+      ],
+      "payoff": "wins a piece",
+      "popularity_rank": 90,
+      "evalCp": 390,
+      "provisional": true
+    },
+    {
+      "id": "scotch-qg5-bxg5",
+      "opening": "scotch",
+      "name": "Scotch: the ...Qg5?? lunge",
+      "line": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "exd4",
+        "Nxd4"
+      ],
+      "fen": "r1bqkbnr/pppp1ppp/2n5/8/3NP3/8/PPP2PPP/RNBQKB1R b KQkq - 0 4",
+      "mistake": {
+        "san": "Qg5",
+        "freqPct": 1.6,
+        "winRate": 90
+      },
+      "punish": [
+        {
+          "san": "Bxg5",
+          "why": "Playing d4 opened the c1–g5 diagonal. The queen stepped straight onto it and simply drops."
+        }
+      ],
+      "payoff": "wins the queen",
+      "popularity_rank": 64,
+      "evalCp": 640,
+      "provisional": true
+    },
+    {
+      "id": "caro-exchange-qf3",
+      "opening": "caro-kann",
+      "name": "Caro-Kann Exchange: 6.Qf3?! meets ...e5!",
+      "line": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "exd5",
+        "cxd5",
+        "Bd3",
+        "Nc6",
+        "c3",
+        "Nf6"
+      ],
+      "fen": "r1bqkb1r/pp2pppp/2n2n2/3p4/3P4/2PB4/PP3PPP/RNBQK1NR w KQkq - 1 6",
+      "mistake": {
+        "san": "Qf3",
+        "freqPct": 5,
+        "winRate": 60
+      },
+      "punish": [
+        {
+          "san": "e5",
+          "why": "The queen left d1, so the d4-pawn is loose — this central break rips the centre open."
+        },
+        {
+          "san": "dxe5",
+          "why": "White grabs the pawn, but it won’t hold."
+        },
+        {
+          "san": "Ng4",
+          "why": "Hitting e5 again and threatening the fork on f2; the pawn falls back."
+        },
+        {
+          "san": "Be3",
+          "why": "Propping up e5 and covering f2."
+        },
+        {
+          "san": "Ngxe5",
+          "why": "Recovers the pawn and attacks the d3-bishop — ...Nxd3+ next snags the bishop pair."
+        }
+      ],
+      "payoff": "wins the bishop pair and a fine position",
+      "popularity_rank": 50,
+      "evalCp": 60,
+      "provisional": true
+    }
+  ]
+}
