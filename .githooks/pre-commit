@@ -1,0 +1,9 @@
+#!/bin/sh
+# Replay every trap through chess.js before allowing a commit, so illegal or
+# inconsistent trap data can never land. Enable with: npm install (sets
+# core.hooksPath to .githooks), or `git config core.hooksPath .githooks`.
+echo "pre-commit: validating traps.json…"
+node scripts/validate-traps.mjs || {
+  echo "pre-commit: trap validation failed — commit aborted." >&2
+  exit 1
+}
