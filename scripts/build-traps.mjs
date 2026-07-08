@@ -26,6 +26,16 @@ const API = 'https://explorer.lichess.ovh/lichess';
 const SPEEDS = 'blitz,rapid';
 const RATINGS = '1200,1400,1600,1800';
 
+// The explorer returns 401 to anonymous requests from datacenter IPs; a
+// personal API token (https://lichess.org/account/oauth/token, no scopes)
+// passed via LICHESS_TOKEN gets through.
+const TOKEN = process.env.LICHESS_TOKEN || process.env.LICHESS_API_TOKEN || '';
+const HTTP_HEADERS = {
+  Accept: 'application/json',
+  'User-Agent': 'chess-trap-trainer/1.0 (opening-trap study tool)',
+  ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}),
+};
+
 // ---- Tunable thresholds (from the build spec) --------------------------------
 const MIN_GAMES_AT_NODE = 500; // prune thinner branches rather than lower this
 const MIN_FREQ = 0.08; //  reply played in >=8% of games at the node
@@ -78,7 +88,15 @@ async function explorer(uciMoves) {
     if (wait) await sleep(wait);
     lastRequest = Date.now();
 
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    const res = await fetch(url, { headers: HTTP_HEADERS });
+    if (res.status === 401 || res.status === 403) {
+      throw new Error(
+        `explorer ${res.status} — the explorer refused this request. ` +
+          (TOKEN
+            ? 'The LICHESS_TOKEN provided was rejected.'
+            : 'Set LICHESS_TOKEN to a personal API token from https://lichess.org/account/oauth/token (no scopes needed).'),
+      );
+    }
     if (res.status === 429) {
       const retryAfter = Number(res.headers.get('retry-after')) || 0;
       const backoff = Math.max(retryAfter * 1000, 2000 * 2 ** attempt);

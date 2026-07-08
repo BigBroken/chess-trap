@@ -54,10 +54,18 @@ node scripts/build-traps.mjs --opening=scotch --max-depth=12
   (sorted by `popularity_rank = frequency × win-rate delta`).
 - Thin branches (<500 games) are pruned rather than loosening the thresholds.
 
-> **Network note:** the explorer host (`explorer.lichess.ovh`) must be reachable.
-> In sandboxes where it's blocked, the app instead ships a **provisional seed**
-> (below); running `traps:build` where Lichess is reachable overwrites it with
-> real data.
+> **Network note:** the explorer host (`explorer.lichess.ovh`) must be reachable
+> — and it returns **401** to anonymous requests from many datacenter IPs. If
+> you hit that, set `LICHESS_TOKEN` to a personal API token
+> (<https://lichess.org/account/oauth/token>, no scopes needed):
+> `LICHESS_TOKEN=lip_... npm run traps:build`. Where Lichess isn't reachable at
+> all, the app instead ships a **provisional seed** (below); running
+> `traps:build` where Lichess is reachable overwrites it with real data.
+>
+> The **Build traps from Lichess** GitHub Actions workflow
+> (`.github/workflows/build-traps.yml`, manual trigger) runs the same crawl on
+> a GitHub runner and commits the refreshed `data/traps.json` back to the
+> branch it was launched from.
 
 #### Provisional seed (`scripts/build-seed.mjs`)
 

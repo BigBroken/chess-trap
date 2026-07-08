@@ -1,0 +1,99 @@
+name: Build traps from Lichess
+
+# Crawls the Lichess opening explorer (most-played lines, blitz/rapid
+# 1200-1800) with scripts/build-traps.mjs and commits the resulting
+# data/traps.json back to the branch it was run on.
+#
+# Run it manually from the Actions tab (workflow_dispatch). If the explorer
+# refuses anonymous requests from the runner, add a repo secret LICHESS_TOKEN
+# (a personal API token from https://lichess.org/account/oauth/token — no
+# scopes needed) and re-run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_depth:
+        description: 'Max plies from the game start to crawl'
+        default: '12'
+        required: false
+      opening:
+        description: 'Limit to one opening (scotch | caro-kann), empty = both'
+        default: ''
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-traps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Reuse explorer responses from earlier (partial) runs so a timeout or
+      # failure doesn't throw away hours of rate-limited crawling.
+      - uses: actions/cache/restore@v4
+        with:
+          path: data/cache
+          key: lichess-cache-${{ github.run_id }}
+          restore-keys: lichess-cache-
+
+      - name: Probe explorer access
+        env:
+          LICHESS_TOKEN: ${{ secrets.LICHESS_TOKEN }}
+        run: |
+          HDR=()
+          if [ -n "$LICHESS_TOKEN" ]; then HDR=(-H "Authorization: Bearer $LICHESS_TOKEN"); fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "${HDR[@]}" \
+            -H 'User-Agent: chess-trap-trainer/1.0 (opening-trap study tool)' \
+            'https://explorer.lichess.ovh/lichess?variant=standard&speeds=blitz,rapid&ratings=1200,1400,1600,1800&play=e2e4')
+          echo "explorer probe: HTTP $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::explorer.lichess.ovh returned HTTP $code from this runner. Add a LICHESS_TOKEN repository secret (https://lichess.org/account/oauth/token, no scopes) and re-run."
+            exit 1
+          fi
+
+      - name: Crawl explorer and build data/traps.json
+        timeout-minutes: 330
+        env:
+          LICHESS_TOKEN: ${{ secrets.LICHESS_TOKEN }}
+        run: |
+          ARGS="--max-depth=${{ github.event.inputs.max_depth || '12' }}"
+          if [ -n "${{ github.event.inputs.opening }}" ]; then
+            ARGS="$ARGS --opening=${{ github.event.inputs.opening }}"
+          fi
+          node scripts/build-traps.mjs $ARGS
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data/cache
+          key: lichess-cache-${{ github.run_id }}
+
+      - name: Validate trap data
+        run: npm run traps:validate
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: traps-json
+          path: data/traps.json
+
+      - name: Commit & push updated data
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/traps.json
+          if git diff --cached --quiet; then
+            echo 'traps.json unchanged — nothing to commit'
+            exit 0
+          fi
+          git commit -m 'data: rebuild traps.json from Lichess explorer [skip ci]'
+          git push
