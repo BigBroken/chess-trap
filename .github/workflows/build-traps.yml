@@ -10,6 +10,13 @@ name: Build traps from Lichess
 # scopes needed) and re-run.
 
 on:
+  # workflow_dispatch only works once the workflow exists on the default
+  # branch, so also fire on pushes that touch this file (edit the marker
+  # below to re-trigger a crawl from a feature branch).
+  # crawl-marker: 1
+  push:
+    branches: ['claude/lichess-traps-popular-lines-030cwg']
+    paths: ['.github/workflows/build-traps.yml']
   workflow_dispatch:
     inputs:
       max_depth:
