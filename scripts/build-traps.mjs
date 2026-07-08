@@ -151,6 +151,7 @@ async function buildPunish(uciMoves, mySide, chessAtTrigger) {
     }
 
     const san = uciToSan(chess.fen(), chosen.uci);
+    if (!san) break;
     const moveObj = chess.move(san);
     if (!moveObj) break;
     uci.push(chosen.uci);

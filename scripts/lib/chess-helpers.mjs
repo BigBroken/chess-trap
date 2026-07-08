@@ -27,14 +27,27 @@ export function fenAfter(sanMoves, startFen) {
   return replaySan(sanMoves, startFen).fen();
 }
 
-/** Convert a UCI move ("e2e4", "e7e8q") to SAN in the given position (mutates a clone). */
+/**
+ * Convert a UCI move ("e2e4", "e7e8q") to SAN in the given position.
+ * Returns null (instead of throwing, as chess.js does) for illegal moves.
+ * Lichess encodes castling as king-takes-rook ("e1h1", "e8a8"); chess.js
+ * wants the king's destination square, so translate those.
+ */
 export function uciToSan(fen, uci) {
   const chess = new Chess(fen);
   const from = uci.slice(0, 2);
-  const to = uci.slice(2, 4);
+  let to = uci.slice(2, 4);
   const promotion = uci.length > 4 ? uci[4] : undefined;
-  const move = chess.move({ from, to, promotion });
-  return move ? move.san : null;
+  const castling = { e1h1: 'g1', e1a1: 'c1', e8h8: 'g8', e8a8: 'c8' };
+  if (chess.get(from)?.type === 'k' && castling[from + to]) {
+    to = castling[from + to];
+  }
+  try {
+    const move = chess.move({ from, to, promotion });
+    return move ? move.san : null;
+  } catch {
+    return null;
+  }
 }
 
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
