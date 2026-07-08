@@ -41,6 +41,8 @@ const MIN_GAMES_AT_NODE = 500; // prune thinner branches rather than lower this
 const MIN_FREQ = 0.08; //  reply played in >=8% of games at the node
 const MIN_WINRATE = 0.58; //  my win rate after the reply
 const MIN_WINRATE_JUMP = 0.08; //  or jumps >=8 pts vs the node average
+const MIN_WINRATE_FLOOR = 0.5; //  ...but never call it a trap while I score under 50%
+const TOP_PER_OPENING = 100; //  keep the N best per opening (override with --top=N)
 const MAX_DEPTH_DEFAULT = 12; // plies from the root
 const TRUNK_FREQ = 0.06; //  only descend moves this common to build the trunk
 const TRUNK_BRANCH = 4; //  ...and at most this many per node
@@ -202,12 +204,16 @@ async function walk(opening, uciMoves, sanLine, depth, maxDepth, chess, traps, s
       if (freq < MIN_FREQ || g < 30) continue;
       const moveWin = winRateFor(m, opening.mySide);
       const jump = moveWin - nodeWinRate;
-      const punishable = moveWin >= MIN_WINRATE || jump >= MIN_WINRATE_JUMP;
+      const punishable =
+        moveWin >= MIN_WINRATE || (jump >= MIN_WINRATE_JUMP && moveWin >= MIN_WINRATE_FLOOR);
       if (!punishable) continue;
 
       const san = uciToSan(chess.fen(), m.uci);
       if (!san) continue;
-      const key = `${opening.id}:${cacheKey([...uciMoves, m.uci])}`;
+      // Dedupe by position + mistake, not by move order, so transpositions
+      // don't produce the same trap several times.
+      const posKey = chess.fen().split(' ').slice(0, 4).join(' ');
+      const key = `${opening.id}:${posKey}:${san}`;
       if (seen.has(key)) continue;
       seen.add(key);
 
@@ -276,13 +282,16 @@ async function main() {
     }),
   );
   const maxDepth = Number(args['max-depth']) || MAX_DEPTH_DEFAULT;
+  const top = Number(args.top) || TOP_PER_OPENING;
   const which = args.opening ? [args.opening] : ['scotch', 'caro-kann'];
 
   let all = [];
   for (const id of which) {
     const opening = OPENINGS[id];
     if (!opening) throw new Error(`unknown opening ${id}`);
-    all = all.concat(await buildOpening(opening, maxDepth));
+    const found = await buildOpening(opening, maxDepth);
+    if (found.length > top) console.log(`  keeping top ${top} of ${found.length} by popularity_rank`);
+    all = all.concat(found.slice(0, top));
   }
 
   await mkdir(path.dirname(OUT_FILE), { recursive: true });

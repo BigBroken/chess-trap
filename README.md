@@ -48,7 +48,11 @@ node scripts/build-traps.mjs --opening=scotch --max-depth=12
   `data/cache/` keyed by move sequence, so re-runs are cheap.
 - A reply is a **trap candidate** when it is *common* (played in ≥8% of games at
   a node with ≥500 total games) **and** *punishable* (my win rate after it ≥58%,
-  or ≥8 points above the node average).
+  or ≥8 points above the node average while still ≥50% — mistakes in lines I'm
+  losing anyway don't count).
+- Candidates are deduped by position + mistake (transpositions would otherwise
+  repeat the same trap), and only the top 100 per opening by `popularity_rank`
+  are kept (`--top=N` to change).
 - For each candidate it follows the highest-win-rate continuation for my side to
   build the refutation, and writes everything to `data/traps.json`
   (sorted by `popularity_rank = frequency × win-rate delta`).
@@ -69,13 +73,13 @@ node scripts/build-traps.mjs --opening=scotch --max-depth=12
 
 #### Provisional seed (`scripts/build-seed.mjs`)
 
-Because this repo was built in an environment where the Lichess host was blocked
-by network policy, `data/traps.json` currently holds a small **hand-authored,
-engine-vetted** seed so the app is usable immediately. Every seed line was
-checked with Stockfish 18 (see `scripts/analyze-candidates.mjs`) so the
-refutations are sound against best defence; the frequency/win-rate figures are
-honest **estimates**, not Lichess data, and each entry is flagged
-`"provisional": true`. The home screen shows a banner while seed data is active.
+`data/traps.json` now holds **real Lichess explorer data** (see `generatedAt`
+in the file). Before that was possible, the repo shipped a small
+hand-authored, engine-vetted seed: every seed line was checked with
+Stockfish 18 (see `scripts/analyze-candidates.mjs`), its frequency/win-rate
+figures were estimates flagged `"provisional": true`, and the home screen
+shows a banner while such seed data is active. `traps:seed` can still
+regenerate it as a fallback.
 
 ```bash
 npm run traps:seed        # regenerate the provisional data/traps.json
